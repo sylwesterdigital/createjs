@@ -1,0 +1,139 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+
+    <style type="text/css">
+        body {
+            overflow: hidden;
+            margin: 0;
+            border: 0;
+        }
+        canvas {
+            background-color: black;
+        }
+    </style>
+
+    <!--
+    <script src="http://code.createjs.com/easeljs-0.8.1.min.js"></script>
+    <script src="https://code.createjs.com/tweenjs-0.6.2.min.js"></script>
+-->
+
+    <script src="js/easeljs-0.8.1.min.js"></script>
+    <script src="js/tweenjs-0.6.2.min.js"></script>
+
+</head>
+
+<body>
+
+    <canvas id="canvas1"></canvas>
+
+    <script>
+        
+        "use strict";
+        
+        //variables
+        var rect1, stage;
+        var clickFree = false;
+        var sw = window.innerWidth;
+        var sh = window.innerHeight;
+        var w = sw * 0.2;
+        var h = sh * 0.2;
+        var mx = sw * 0.5 - w * 0.5;
+        var my = sh * 0.5 - h * 0.5;
+        
+        //objects
+        stage = new createjs.Stage("canvas1");
+        rect1 = new createjs.Shape();
+        stage.addChild(rect1);
+
+        //methods
+        function draw(nx, ny, cw, ch, nw, nh, time) {
+
+            rect1.width = cw;
+            rect1.height = ch;
+
+            createjs.Tween.get(rect1, {override:true})
+                .to({
+                    x: nx,
+                    y: ny,
+                    width: nw,
+                    height: nh
+                }, time * 1500, createjs.Ease.getPowInOut(4))
+                .to({
+                    x: mx,
+                    y: my,
+                    width: w,
+                    height: h
+                }, time * 1500, createjs.Ease.getPowInOut(4))
+                .call(onComplete)
+                .addEventListener("change", handleChange);
+
+            function handleChange(event) {
+                rect1.graphics.clear();
+                rect1.graphics.beginFill("white").drawRect(0, 0, rect1.width, rect1.height);
+            }
+
+            function onComplete(event) {
+                console.log('complete');
+                clickFree = false;
+            }
+
+        }
+
+        createjs.Ticker.setFPS(60);
+        createjs.Ticker.addEventListener("tick", stage);
+
+        // handler methods
+        rect1.addEventListener("click", handleClick);
+        
+        function handleClick(event) {
+            //console.log('clicked',clickFree);
+            if(clickFree == false) {
+                draw(0, 0, rect1.width, rect1.height, sw, sh, 1.5);
+                clickFree = true;
+            }
+        }
+
+        window.addEventListener('resize', onResize, false);
+
+        function onResize() {
+            //console.log('onResize');
+            resizeCanvas();
+        }
+
+        function resizeCanvas() {
+
+            //console.log('resizeCanvas');
+
+            sw = window.innerWidth;
+            sh = window.innerHeight;
+            w = sw * 0.2;
+            h = sh * 0.2;
+            mx = sw * 0.5 - w * 0.5;
+            my = sh * 0.5 - h * 0.5;
+
+            canvas1.width = sw;
+            canvas1.height = sh;
+            //canvas1.style.backgroundColor = 'black';
+        }
+
+        function init() {
+            //console.log('init');
+            resizeCanvas();
+            draw(mx, my, rect1.width, rect1.height, w, h, 0);
+
+        }
+        
+        window.addEventListener("orientationchange", function() {
+            window.location.reload();
+        }, false);        
+
+        init();
+        
+    </script>
+
+
+</body>
+
+</html>
